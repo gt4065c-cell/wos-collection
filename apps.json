@@ -9,8 +9,7 @@
     "hours": 0,
     "users": 412,
     "url": "https://gt4065b.github.io/wos-idea-bank/",
-    "desc": "업무 개선 아이디어를 등록하고 격주 심의로 정규 WOS 리스트에 올립니다.",
-    "featured": true
+    "desc": "업무 개선 아이디어를 등록하고 격주 심의로 정규 WOS 리스트에 올립니다."
   },
   {
     "id": "WOS-002",
@@ -50,15 +49,16 @@
   },
   {
     "id": "WOS-005",
-    "name": "외국인 유학생 다국어 안내",
-    "cat": "student",
+    "name": "우송대 실시간 다국어 강의통역",
+    "cat": "teach",
     "status": "beta",
-    "icon": "globe",
-    "dept": "국제교류처",
+    "icon": "users",
+    "dept": "기획처",
     "hours": 960,
     "users": 84,
-    "url": "#",
-    "desc": "학사 공지를 영어·중국어·베트남어·우즈베크어로 바로 번역해 보냅니다."
+    "url": "https://translation-delta-azure.vercel.app",
+    "desc": "강의실에서 교수님의 강의 내용을 실시간으로 영어·중국어·베트남어·우즈베크어로 바로 번역해 보여줍니다.",
+    "featured": true
   },
   {
     "id": "WOS-006",
