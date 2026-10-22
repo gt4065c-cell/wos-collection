@@ -146,10 +146,10 @@
   {
     "id": "WOS-013",
     "name": "WOS 강의플랫폼 (All New AI LMS)",
-    "cat": "admin",
-    "status": "live",
+    "cat": "teach",
+    "status": "beta",
     "icon": "book",
-    "dept": "",
+    "dept": "AI경영학과 김형태교수",
     "hours": 0,
     "users": 0,
     "url": "https://test-b0582.web.app/",
