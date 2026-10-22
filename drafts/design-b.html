@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WOS 컬렉션 · 커맨드 콘솔</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* 시안 B · 커맨드 콘솔: 어두운 화면 하나로 통일, 큰 검색창(명령줄) + 키보드로 고르는 목록 + 오른쪽 상세 */
+:root {
+  --bg: #0b0f14;
+  --surface: #121821;
+  --raise: #19212d;
+  --ink: #e6edf3;
+  --muted: #8592a3;
+  --line: #243041;
+  --signal: #4fd1c5;
+  --signal-dim: #173a3a;
+  --live: #4fd1c5; --beta: #f0b85a; --soon: #6b778a;
+  --sans: 'Gothic A1', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(79,209,197,.10), transparent 70%); }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* 로그인: 터미널 */
+.term { max-width: 560px; margin: 10vh auto 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 30px 80px -30px rgba(0,0,0,.8); }
+.term-bar { display: flex; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.term-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: inline-block; }
+.term-bar span { margin-left: 8px; }
+.term-body { padding: 22px 20px 26px; font-family: var(--mono); font-size: 14px; display: grid; gap: 6px; }
+.term-body .dim { color: var(--muted); }
+.term-body .ok { color: var(--signal); }
+.term-body .bad { color: #ff7b72; }
+.term-title { font-family: var(--sans); font-weight: 800; font-size: 28px; letter-spacing: -.01em; margin: 6px 0 10px; }
+.term-title b { color: var(--signal); }
+.prompt { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.prompt label { color: var(--signal); white-space: nowrap; }
+.prompt input { flex: 1; min-width: 0; background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: 6px 2px; font-family: var(--mono); letter-spacing: .4em; outline: none; caret-color: var(--signal); }
+.prompt input:focus { border-color: var(--signal); }
+.prompt button { background: var(--signal); color: #04201e; border: 0; border-radius: 6px; padding: 6px 12px; font-weight: 600; cursor: pointer; font-family: var(--mono); font-size: 13px; }
+
+/* 허브 */
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; }
+.logo { font-family: var(--mono); font-weight: 600; letter-spacing: .04em; display: flex; gap: 10px; align-items: center; }
+.logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px var(--signal); }
+.logo small { color: var(--muted); font-weight: 400; }
+.head-right { display: flex; gap: 14px; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.head-right button { background: none; border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer; color: var(--muted); }
+.head-right button:hover { color: var(--ink); border-color: var(--muted); }
+
+.cmd { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px 16px; }
+.cmd:focus-within { border-color: var(--signal); box-shadow: 0 0 0 4px var(--signal-dim); }
+.cmd .gt { font-family: var(--mono); color: var(--signal); }
+.cmd input { flex: 1; min-width: 0; background: none; border: 0; outline: none; padding: 14px 0; font-size: 18px; }
+.kbd { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 1px 6px; color: var(--muted); white-space: nowrap; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; }
+.chips button { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; color: var(--muted); font-size: 13px; }
+.chips button[aria-pressed="true"] { border-color: var(--signal); color: var(--signal); background: var(--signal-dim); }
+
+.cols { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.list-head { display: grid; grid-template-columns: 84px 1fr 86px; gap: 12px; padding: 10px 16px; font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; border-bottom: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: 84px 1fr 86px; gap: 12px; align-items: center; width: 100%; padding: 12px 16px; background: none; border: 0; border-bottom: 1px solid var(--line); text-align: left; cursor: pointer; }
+.row:last-child { border-bottom: 0; }
+.row:hover { background: var(--raise); }
+.row[aria-selected="true"] { background: var(--raise); box-shadow: inset 3px 0 0 var(--signal); }
+.row .id { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.row .nm { min-width: 0; }
+.row .nm b { display: block; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .nm span { font-size: 12.5px; color: var(--muted); }
+.st { font-family: var(--mono); font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.st::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.st.live { color: var(--live); } .st.beta { color: var(--beta); } .st.soon { color: var(--soon); }
+.none { padding: 36px 16px; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 13px; }
+
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); display: grid; gap: 16px; }
+.detail .ic { width: 52px; height: 52px; border-radius: 12px; background: var(--signal-dim); color: var(--signal); display: grid; place-items: center; }
+.detail h2 { margin: 0; font-size: 22px; font-weight: 800; text-wrap: balance; }
+.detail p { margin: 0; color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 13px; margin: 0; }
+.kv dt { font-family: var(--mono); color: var(--muted); font-size: 12px; }
+.kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+.go { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 12px; border-radius: 8px; background: var(--signal); color: #04201e; font-weight: 700; text-decoration: none; border: 0; cursor: pointer; }
+.go[aria-disabled="true"] { background: var(--raise); color: var(--muted); cursor: not-allowed; }
+.foot { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 18px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.foot b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 820px) {
+  .cols { grid-template-columns: 1fr; }
+  .detail { position: static; order: -1; }
+  .list-head { display: none; }
+  .row { grid-template-columns: 1fr auto; }
+  .row .id { display: none; }
+  .cmd .kbd { display: none; }
+}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script src="apps.js"></script>
+<script>
+(function () {
+  var W = window.WOS, root = document.getElementById('app');
+  var state = { q: '', cat: 'all', sel: 0 };
+
+  function renderLogin(lines) {
+    root.innerHTML =
+      '<div class="term" role="region" aria-label="관리자 로그인">' +
+        '<div class="term-bar"><i></i><i></i><i></i><span>wos-collection — admin</span></div>' +
+        '<form class="term-body" id="f" autocomplete="off">' +
+          '<span class="dim">$ wos --login --role=admin</span>' +
+          '<div class="term-title">WOS <b>Collection</b></div>' +
+          '<span class="dim">우송대학교 AX 업무지원 앱 ' + W.APPS.length + '개 · 관리자 전용</span>' +
+          (lines || '') +
+          '<div class="prompt"><label for="pin">password:</label><input id="pin" type="password" inputmode="numeric" maxlength="8" autofocus><button type="submit">ENTER</button></div>' +
+          '<span class="dim" style="margin-top:10px">시안 확인용 비밀번호 9660</span>' +
+        '</form>' +
+      '</div>';
+    document.getElementById('f').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (W.login(document.getElementById('pin').value)) render();
+      else renderLogin('<span class="bad">✕ 인증 실패: 비밀번호가 맞지 않습니다.</span>');
+    });
+  }
+
+  function current() { return W.filter(state.q, state.cat); }
+
+  function rows(list) {
+    if (!list.length) return '<div class="none">// 일치하는 앱 없음. 다른 검색어를 입력하세요.</div>';
+    return list.map(function (a, i) {
+      return '<button type="button" class="row" role="option" data-i="' + i + '" aria-selected="' + (i === state.sel) + '">' +
+        '<span class="id">' + a.id + '</span>' +
+        '<span class="nm"><b>' + W.esc(a.name) + '</b><span>' + W.esc(a.dept) + ' · ' + W.catName(a.cat) + '</span></span>' +
+        '<span class="st ' + a.status + '">' + W.STATUS[a.status] + '</span></button>';
+    }).join('');
+  }
+
+  function detail(a) {
+    if (!a) return '<div class="none">// 왼쪽에서 앱을 고르세요.</div>';
+    var open = a.url && a.url !== '#' && a.status !== 'soon';
+    return '<div class="ic">' + W.icon(a.icon, 28) + '</div>' +
+      '<div><h2>' + W.esc(a.name) + '</h2></div><p>' + W.esc(a.desc) + '</p>' +
+      '<dl class="kv"><dt>번호</dt><dd>' + a.id + '</dd><dt>상태</dt><dd><span class="st ' + a.status + '">' + W.STATUS[a.status] + '</span></dd>' +
+      '<dt>담당</dt><dd>' + W.esc(a.dept) + '</dd><dt>사용자</dt><dd>' + (a.users ? a.users.toLocaleString() + '명' : '—') + '</dd>' +
+      '<dt>절감 예상</dt><dd>' + (a.hours ? '연 ' + a.hours.toLocaleString() + '시간' : '—') + '</dd></dl>' +
+      (open ? '<a class="go" href="' + a.url + '" target="_blank" rel="noopener">앱 열기 <span class="kbd" style="border-color:#04201e55;color:#04201e">↵</span></a>'
+            : '<span class="go" aria-disabled="true">' + (a.status === 'soon' ? '개발 중' : '주소 연결 전') + '</span>');
+  }
+
+  function update() {
+    var list = current();
+    if (state.sel >= list.length) state.sel = Math.max(0, list.length - 1);
+    document.getElementById('list').innerHTML = rows(list);
+    document.getElementById('detail').innerHTML = detail(list[state.sel]);
+  }
+
+  function renderHub() {
+    var t = W.totals();
+    root.innerHTML =
+      '<header class="head"><div class="logo"><span class="dot"></span>WOS_COLLECTION <small>/ 우송대 AX 업무지원</small></div>' +
+        '<div class="head-right"><span>admin@wsu</span><button type="button" id="logout">로그아웃</button></div></header>' +
+      '<div class="cmd"><span class="gt">&gt;</span><input id="q" type="search" placeholder="무엇을 도와드릴까요? 예: 회의록, 번역, WOS-003" value="' + W.esc(state.q) + '" aria-label="앱 검색"><span class="kbd">/ 검색 · ↑↓ 이동 · ↵ 열기</span></div>' +
+      '<div class="chips">' + W.CATS.map(function (c) {
+        return '<button type="button" data-cat="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' + c.name + '</button>';
+      }).join('') + '</div>' +
+      '<div class="cols"><div class="list" role="listbox" aria-label="앱 목록"><div class="list-head"><span>NO.</span><span>APP</span><span>STATUS</span></div><div id="list"></div></div>' +
+      '<aside class="detail" id="detail"></aside></div>' +
+      '<div class="foot"><span>등록 <b>' + t.apps + '</b></span><span>운영 중 <b>' + t.live + '</b></span><span>사용자 <b>' + t.users.toLocaleString() + '</b></span><span>연간 절감 예상 <b>' + t.hours.toLocaleString() + 'h</b></span></div>';
+
+    update();
+    var q = document.getElementById('q');
+    q.addEventListener('input', function () { state.q = q.value; state.sel = 0; update(); });
+    root.querySelectorAll('[data-cat]').forEach(function (b) {
+      b.addEventListener('click', function () { state.cat = b.dataset.cat; state.sel = 0; renderHub(); });
+    });
+    document.getElementById('list').addEventListener('click', function (e) {
+      var r = e.target.closest('.row'); if (!r) return;
+      state.sel = +r.dataset.i; update();
+    });
+    document.getElementById('logout').addEventListener('click', function () { W.logout(); renderLogin(); });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    var q = document.getElementById('q');
+    if (!q) return;
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); return; }
+    var list = current(); if (!list.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); state.sel = Math.min(list.length - 1, state.sel + 1); update(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); state.sel = Math.max(0, state.sel - 1); update(); }
+    else if (e.key === 'Enter' && document.activeElement === q) {
+      var link = document.querySelector('#detail a.go'); if (link) link.click();
+    }
+  });
+
+  function render() { W.isAuthed() ? renderHub() : renderLogin(); }
+  render();
+})();
+</script>
+
+</html>

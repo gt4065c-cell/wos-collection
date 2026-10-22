@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WOS 컬렉션 · 캠퍼스 런처</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 시안 A · 캠퍼스 런처: 왼쪽 분류 레일 + 상단 성과 띠 + 앱 카드 격자 */
+:root {
+  --bg: #f3f5f9;
+  --panel: #ffffff;
+  --ink: #142033;
+  --muted: #5d6a80;
+  --line: #dde3ec;
+  --navy: #0f2c5c;
+  --navy-ink: #ffffff;
+  --accent: #e8921c;
+  --accent-soft: #fdf1df;
+  --live: #1f8a5b; --live-bg: #e3f4ec;
+  --beta: #2f62c8; --beta-bg: #e6eefc;
+  --soon: #7a8396; --soon-bg: #eceff4;
+  --sans: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1420; --panel: #152033; --ink: #e7ecf4; --muted: #94a2b8; --line: #26344b;
+  --navy: #1b3f7a; --navy-ink: #ffffff; --accent: #f2a84a; --accent-soft: #3a2a14;
+  --live: #5fd19c; --live-bg: #123527; --beta: #8fb2ff; --beta-bg: #1a2b4d; --soon: #9aa5b8; --soon-bg: #222d3f;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d1420; --panel: #152033; --ink: #e7ecf4; --muted: #94a2b8; --line: #26344b;
+  --navy: #1b3f7a; --navy-ink: #ffffff; --accent: #f2a84a; --accent-soft: #3a2a14;
+  --live: #5fd19c; --live-bg: #123527; --beta: #8fb2ff; --beta-bg: #1a2b4d; --soon: #9aa5b8; --soon-bg: #222d3f;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 로그인 */
+.login { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+.login-art { background: var(--navy); color: var(--navy-ink); padding-block: 48px; padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: 32px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
+.login-art .mark { font-family: var(--mono); font-size: 13px; letter-spacing: .12em; opacity: .75; }
+.login-art h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.2; margin: 0; text-wrap: balance; font-weight: 700; }
+.login-art h1 em { font-style: normal; color: var(--accent); }
+.login-art p { opacity: .8; max-width: 34ch; margin: 12px 0 0; }
+.login-ids { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 12px; }
+.login-ids span { border: 1px solid rgba(255,255,255,.28); border-radius: 4px; padding: 2px 7px; }
+.login-form { display: grid; place-items: center; padding-block: 48px; padding-left: 24px; padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.login-form form { width: 100%; max-width: 340px; display: grid; gap: 14px; }
+.login-form h2 { margin: 0; font-size: 22px; }
+.login-form label { font-size: 13px; color: var(--muted); font-weight: 500; }
+.pin { width: 100%; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); font-family: var(--mono); font-size: 22px; letter-spacing: .5em; }
+.btn-primary { padding: 13px; border: 0; border-radius: 10px; background: var(--navy); color: var(--navy-ink); font-weight: 600; cursor: pointer; }
+.btn-primary:hover { filter: brightness(1.12); }
+.err { color: #d1453b; font-size: 13px; min-height: 1.2em; margin: 0; }
+.hint { font-size: 12px; color: var(--muted); margin: 0; }
+
+/* 허브 */
+.shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+.rail { background: var(--panel); border-right: 1px solid var(--line); padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; display: flex; flex-direction: column; gap: 24px; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.brand-badge { width: 34px; height: 34px; border-radius: 8px; background: var(--navy); color: var(--navy-ink); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; }
+.brand small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.cats { display: grid; gap: 2px; }
+.cats button { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border: 0; background: none; border-radius: 8px; cursor: pointer; text-align: left; color: var(--muted); font-weight: 500; }
+.cats button:hover { background: var(--bg); color: var(--ink); }
+.cats button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+.cats .n { font-family: var(--mono); font-size: 12px; }
+.rail-foot { margin-top: auto; display: grid; gap: 8px; }
+.ghost { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: none; cursor: pointer; font-size: 13px; text-align: left; }
+.ghost:hover { border-color: var(--muted); }
+
+main { min-width: 0; padding-block: 28px 48px; padding-left: 32px; padding-right: max(32px, env(safe-area-inset-right, 0px)); display: grid; gap: 24px; align-content: start; }
+.top { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; justify-content: space-between; }
+.top h1 { margin: 0; font-size: 26px; text-wrap: balance; }
+.top p { margin: 4px 0 0; color: var(--muted); }
+.search { position: relative; flex: 0 1 340px; min-width: 0; }
+.search input { width: 100%; padding: 11px 14px 11px 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--navy); color: var(--navy-ink); border-radius: 14px; overflow: hidden; }
+.stat { padding: 18px 20px; border-left: 1px solid rgba(255,255,255,.14); }
+.stat:first-child { border-left: 0; }
+.stat b { display: block; font-size: 26px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; opacity: .78; letter-spacing: .02em; }
+.stat b i { font-style: normal; font-size: 14px; font-weight: 500; opacity: .8; margin-left: 2px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; transition: transform .15s, box-shadow .15s, border-color .15s; cursor: pointer; text-align: left; }
+.card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 10px 24px -14px rgba(15, 44, 92, .45); }
+.card-head { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+.ico { width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.card h3 { margin: 0; font-size: 16px; }
+.card p { margin: 0; color: var(--muted); font-size: 13.5px; flex: 1; }
+.meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.code { font-family: var(--mono); }
+.pill { font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.live { color: var(--live); background: var(--live-bg); }
+.pill.beta { color: var(--beta); background: var(--beta-bg); }
+.pill.soon { color: var(--soon); background: var(--soon-bg); }
+.card.is-soon { opacity: .72; }
+.empty { padding: 40px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; }
+
+@media (max-width: 860px) {
+  .login { grid-template-columns: 1fr; }
+  .login-art { padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { min-width: 0; }
+  .rail { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding-right: max(16px, env(safe-area-inset-right, 0px)); gap: 14px; }
+  .cats { display: flex; overflow-x: auto; gap: 6px; }
+  .cats button { white-space: nowrap; gap: 8px; border: 1px solid var(--line); }
+  .rail-foot { flex-direction: row; display: flex; margin-top: 0; }
+  main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.14); }
+}
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+
+<div id="app"></div>
+
+<script src="apps.js"></script>
+<script>
+(function () {
+  var W = window.WOS, root = document.getElementById('app');
+  var state = { q: '', cat: 'all' };
+
+  function renderLogin(msg) {
+    var t = W.totals();
+    root.innerHTML =
+      '<section class="login">' +
+        '<div class="login-art">' +
+          '<div class="mark">WOOSONG UNIVERSITY · AX</div>' +
+          '<div><h1>우송대 업무지원 앱을<br><em>한곳에서</em> 엽니다</h1>' +
+          '<p>교수학습·학생지원·행정·연구 업무를 돕는 AI 앱 ' + t.apps + '개를 모았습니다.</p></div>' +
+          '<div class="login-ids">' + W.APPS.slice(0, 6).map(function (a) { return '<span>' + a.id + '</span>'; }).join('') + '<span>…</span></div>' +
+        '</div>' +
+        '<div class="login-form"><form id="f" autocomplete="off">' +
+          '<h2>관리자 로그인</h2>' +
+          '<label for="pin">관리자 비밀번호</label>' +
+          '<input class="pin" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autofocus>' +
+          '<p class="err" id="err">' + (msg || '') + '</p>' +
+          '<button class="btn-primary" type="submit">컬렉션 열기</button>' +
+          '<p class="hint">시안 확인용 비밀번호: 9660</p>' +
+        '</form></div>' +
+      '</section>';
+    document.getElementById('f').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (W.login(document.getElementById('pin').value)) render();
+      else renderLogin('비밀번호가 맞지 않습니다. 다시 입력해 주세요.');
+    });
+  }
+
+  function card(a) {
+    var open = a.url && a.url !== '#';
+    var tag = open ? 'a href="' + a.url + '" target="_blank" rel="noopener"' : 'button type="button" data-id="' + a.id + '"';
+    return '<' + tag + ' class="card' + (a.status === 'soon' ? ' is-soon' : '') + '">' +
+      '<div class="card-head"><div class="ico">' + W.icon(a.icon, 24) + '</div><span class="pill ' + a.status + '">' + W.STATUS[a.status] + '</span></div>' +
+      '<h3>' + W.esc(a.name) + '</h3><p>' + W.esc(a.desc) + '</p>' +
+      '<div class="meta"><span class="code">' + a.id + '</span><span>' + W.esc(a.dept) + '</span></div>' +
+    '</' + (open ? 'a' : 'button') + '>';
+  }
+
+  function renderHub() {
+    var t = W.totals();
+    var count = {}; W.APPS.forEach(function (a) { count[a.cat] = (count[a.cat] || 0) + 1; });
+    var list = W.filter(state.q, state.cat);
+    root.innerHTML =
+      '<div class="shell">' +
+        '<aside class="rail">' +
+          '<div class="brand"><div class="brand-badge">WOS</div><div>WOS 컬렉션<small>우송대 AX 업무지원</small></div></div>' +
+          '<nav class="cats" aria-label="분류">' + W.CATS.map(function (c) {
+            return '<button type="button" data-cat="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' + c.name +
+              '<span class="n">' + (c.id === 'all' ? t.apps : (count[c.id] || 0)) + '</span></button>';
+          }).join('') + '</nav>' +
+          '<div class="rail-foot"><button class="ghost" id="logout" type="button">로그아웃</button></div>' +
+        '</aside>' +
+        '<main>' +
+          '<div class="top"><div><h1>업무지원 앱 컬렉션</h1><p>필요한 앱을 골라 바로 여세요. 새 아이디어는 WOS 아이디어 뱅크로 보내 주세요.</p></div>' +
+            '<label class="search">' + W.icon('search', 18) +
+            '<input id="q" type="search" placeholder="앱 이름, 부서, WOS 번호 검색" value="' + W.esc(state.q) + '" aria-label="앱 검색"></label></div>' +
+          '<div class="stats">' +
+            '<div class="stat"><b>' + t.apps + '<i>개</i></b><span>등록된 앱</span></div>' +
+            '<div class="stat"><b>' + t.live + '<i>개</i></b><span>운영 중</span></div>' +
+            '<div class="stat"><b>' + t.users.toLocaleString() + '<i>명</i></b><span>이번 학기 사용자</span></div>' +
+            '<div class="stat"><b>' + t.hours.toLocaleString() + '<i>시간</i></b><span>연간 절감 예상</span></div>' +
+          '</div>' +
+          '<div class="grid" id="grid">' + (list.length ? list.map(card).join('') : '<div class="empty">조건에 맞는 앱이 없습니다. 검색어를 바꿔 보세요.</div>') + '</div>' +
+        '</main>' +
+      '</div>';
+
+    root.querySelectorAll('[data-cat]').forEach(function (b) {
+      b.addEventListener('click', function () { state.cat = b.dataset.cat; renderHub(); });
+    });
+    var q = document.getElementById('q');
+    q.addEventListener('input', function () {
+      state.q = q.value;
+      var l = W.filter(state.q, state.cat);
+      document.getElementById('grid').innerHTML = l.length ? l.map(card).join('') : '<div class="empty">조건에 맞는 앱이 없습니다. 검색어를 바꿔 보세요.</div>';
+    });
+    document.getElementById('logout').addEventListener('click', function () { W.logout(); renderLogin(); });
+  }
+
+  root.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-id]');
+    if (!b) return;
+    var a = W.APPS.filter(function (x) { return x.id === b.dataset.id; })[0];
+    toast(a.status === 'soon' ? a.name + '은(는) 개발 중입니다.' : a.name + ' 주소가 아직 연결되지 않았습니다.');
+  });
+
+  var tt;
+  function toast(msg) {
+    var el = document.querySelector('.toast') || document.body.appendChild(Object.assign(document.createElement('div'), { className: 'toast' }));
+    el.textContent = msg; el.hidden = false;
+    clearTimeout(tt); tt = setTimeout(function () { el.hidden = true; }, 2200);
+  }
+
+  function render() { W.isAuthed() ? renderHub() : renderLogin(); }
+  render();
+})();
+</script>
+
+</html>

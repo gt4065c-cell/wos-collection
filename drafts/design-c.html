@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WOS 컬렉션 · 앱 서랍</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 시안 C · 앱 서랍: 휴대폰 홈 화면처럼 아이콘을 늘어놓고, 위쪽 벤토 카드에 추천 앱 · 숫자를 배치. 로그인은 4자리 PIN 키패드 */
+:root {
+  --bg: #eef1f6;
+  --card: #ffffff;
+  --ink: #18202e;
+  --muted: #667085;
+  --line: #e1e6ee;
+  --hero: #1e3a8a;
+  --hero-ink: #ffffff;
+  --sun: #ffb020;
+  --c-teach: #3b6cf6; --c-student: #10a37f; --c-admin: #f06a3d; --c-research: #8b5cf6; --c-idea: #e8a400;
+  --display: 'Black Han Sans', 'Apple SD Gothic Neo', sans-serif;
+  --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f131b; --card: #1a202c; --ink: #edf1f7; --muted: #98a2b3; --line: #2a3242; --hero: #2a4bb0; --hero-ink: #ffffff; --sun: #ffc04d;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f131b; --card: #1a202c; --ink: #edf1f7; --muted: #98a2b3; --line: #2a3242; --hero: #2a4bb0; --hero-ink: #ffffff; --sun: #ffc04d;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; word-break: keep-all; overflow-wrap: anywhere; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 24px 110px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* 로그인: PIN 키패드 */
+.lock { max-width: 340px; margin: 6vh auto 0; text-align: center; display: grid; gap: 18px; justify-items: center; }
+.lock-logo { width: 72px; height: 72px; border-radius: 22px; background: var(--hero); color: var(--hero-ink); display: grid; place-items: center; font-family: var(--display); font-size: 22px; box-shadow: 0 14px 30px -12px var(--hero); }
+.lock h1 { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0; }
+.lock p { margin: 0; color: var(--muted); }
+.dots { display: flex; gap: 14px; height: 18px; }
+.dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--muted); transition: background .12s, transform .12s; }
+.dots i.on { background: var(--hero); border-color: var(--hero); transform: scale(1.1); }
+.dots.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px; }
+.pad button { width: 72px; height: 72px; border-radius: 50%; border: 0; background: var(--card); font-size: 26px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 0 var(--line); }
+.pad button:active { background: var(--line); }
+.pad .fn { background: none; box-shadow: none; font-size: 14px; color: var(--muted); }
+.lock .msg { min-height: 1.4em; color: #e0473a; font-size: 14px; }
+.lock .hint { font-size: 12px; }
+
+/* 허브 */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.hello { font-size: 13px; color: var(--muted); }
+.top h1 { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0; line-height: 1.15; }
+.me { height: 40px; padding: 0 16px; border-radius: 999px; white-space: nowrap; border: 0; background: var(--card); cursor: pointer; font-size: 12px; font-weight: 700; color: var(--muted); }
+
+.bento { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: auto auto; gap: 12px; margin-bottom: 26px; }
+.tile { background: var(--card); border-radius: 22px; padding: 18px; min-width: 0; }
+.feature { grid-row: span 2; background: var(--hero); color: var(--hero-ink); display: flex; flex-direction: column; justify-content: space-between; gap: 18px; position: relative; overflow: hidden; }
+.feature::after { content: ""; position: absolute; right: -40px; bottom: -40px; width: 180px; height: 180px; border-radius: 50%; background: var(--sun); opacity: .9; }
+.feature .tag { font-size: 12px; font-weight: 700; letter-spacing: .08em; opacity: .85; }
+.feature h2 { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 6px 0 4px; position: relative; z-index: 1; }
+.feature p { margin: 0; opacity: .85; max-width: 30ch; position: relative; z-index: 1; }
+.feature a, .feature button { align-self: start; position: relative; z-index: 1; background: var(--hero-ink); color: var(--hero); border: 0; border-radius: 999px; padding: 9px 18px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.num b { display: block; font-family: var(--display); font-weight: 400; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.num span { font-size: 13px; color: var(--muted); }
+
+.search { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 16px; padding: 0 16px; margin-bottom: 14px; color: var(--muted); }
+.search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; padding: 14px 0; color: var(--ink); }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 22px; }
+.tabs button { flex: none; border: 0; background: var(--card); border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 500; color: var(--muted); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+.drawer { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 22px 12px; }
+.app { display: grid; justify-items: center; gap: 8px; text-align: center; text-decoration: none; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; position: relative; }
+.squircle { width: 68px; height: 68px; border-radius: 20px; display: grid; place-items: center; color: #fff; box-shadow: 0 10px 20px -12px currentColor; transition: transform .15s; position: relative; }
+.squircle svg { color: #fff; }
+.app:hover .squircle { transform: translateY(-3px) scale(1.04); }
+.app .nm { font-size: 13px; font-weight: 500; line-height: 1.3; max-width: 11ch; text-wrap: balance; }
+.badge { position: absolute; top: -6px; right: -10px; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; background: var(--card); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.18); white-space: nowrap; }
+.app.soon .squircle { filter: grayscale(1); opacity: .5; }
+.c-teach { background: var(--c-teach); color: var(--c-teach); }
+.c-student { background: var(--c-student); color: var(--c-student); }
+.c-admin { background: var(--c-admin); color: var(--c-admin); }
+.c-research { background: var(--c-research); color: var(--c-research); }
+.c-idea { background: var(--c-idea); color: var(--c-idea); }
+.empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 0; }
+
+/* 앱 정보 시트 */
+.sheet-bg { position: fixed; inset: 0; background: rgba(10, 14, 22, .45); display: grid; align-items: end; justify-items: center; z-index: 20; }
+.sheet { width: 100%; max-width: 520px; background: var(--card); border-radius: 26px 26px 0 0; padding-block: 12px calc(24px + env(safe-area-inset-bottom, 0px)); padding-left: max(22px, env(safe-area-inset-left, 0px)); padding-right: max(22px, env(safe-area-inset-right, 0px)); display: grid; gap: 14px; animation: up .22s ease-out; }
+@keyframes up { from { transform: translateY(40px); opacity: .4; } }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); justify-self: center; }
+.sheet-head { display: flex; gap: 14px; align-items: center; }
+.sheet h2 { margin: 0; font-size: 20px; }
+.sheet .sub { font-size: 13px; color: var(--muted); }
+.sheet p { margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.facts div { background: var(--bg); border-radius: 14px; padding: 10px 6px; }
+.facts b { display: block; font-variant-numeric: tabular-nums; }
+.facts span { font-size: 12px; color: var(--muted); }
+.cta { display: block; text-align: center; padding: 14px; border-radius: 14px; background: var(--hero); color: var(--hero-ink); font-weight: 700; text-decoration: none; border: 0; cursor: pointer; width: 100%; }
+.cta.off { background: var(--line); color: var(--muted); cursor: default; }
+
+/* 하단 탭바 */
+.dock { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 4px; background: var(--card); border-radius: 999px; padding: 6px; box-shadow: 0 12px 30px -10px rgba(0,0,0,.3); z-index: 10; }
+.dock button { border: 0; background: none; border-radius: 999px; padding: 9px 16px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.dock button.on { background: var(--hero); color: var(--hero-ink); }
+
+@media (max-width: 720px) {
+  .bento { grid-template-columns: 1fr 1fr; }
+  .feature { grid-column: 1 / -1; grid-row: auto; }
+  .drawer { grid-template-columns: repeat(4, 1fr); gap: 18px 6px; }
+  .squircle { width: 58px; height: 58px; border-radius: 17px; }
+  .app .nm { font-size: 12px; }
+}
+@media (max-width: 380px) { .drawer { grid-template-columns: repeat(3, 1fr); } .pad { grid-template-columns: repeat(3, 64px); } .pad button { width: 64px; height: 64px; } }
+@media (prefers-reduced-motion: reduce) { .squircle, .dots i { transition: none; } .sheet, .dots.shake { animation: none; } }
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script src="apps.js"></script>
+<script>
+(function () {
+  var W = window.WOS, root = document.getElementById('app');
+  var state = { q: '', cat: 'all', view: 'home' };
+  var pin = '';
+
+  function renderLogin(msg) {
+    root.innerHTML =
+      '<div class="lock">' +
+        '<div class="lock-logo">WOS</div>' +
+        '<div><h1>WOS 컬렉션</h1><p>관리자 PIN 4자리를 눌러 주세요</p></div>' +
+        '<div class="dots' + (msg ? ' shake' : '') + '" aria-label="입력한 자리수 ' + pin.length + '">' +
+          [0,1,2,3].map(function (i) { return '<i class="' + (i < pin.length ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
+        '<div class="msg" role="alert">' + (msg || '') + '</div>' +
+        '<div class="pad">' + ['1','2','3','4','5','6','7','8','9'].map(function (n) { return '<button type="button" data-k="' + n + '">' + n + '</button>'; }).join('') +
+          '<button type="button" class="fn" data-k="clr">지우기</button><button type="button" data-k="0">0</button><button type="button" class="fn" data-k="del">←</button></div>' +
+        '<p class="hint">시안 확인용 PIN 9660 · 키보드 숫자도 됩니다</p>' +
+      '</div>';
+  }
+
+  function press(k) {
+    if (k === 'del') pin = pin.slice(0, -1);
+    else if (k === 'clr') pin = '';
+    else if (pin.length < 4) pin += k;
+    if (pin.length === 4) {
+      var ok = W.login(pin); pin = '';
+      if (ok) return render();
+      return renderLogin('PIN이 맞지 않습니다');
+    }
+    renderLogin();
+  }
+
+  function appIcon(a) {
+    var open = a.url && a.url !== '#' && a.status !== 'soon';
+    return '<button type="button" class="app ' + a.status + '" data-id="' + a.id + '">' +
+      '<span class="squircle c-' + a.cat + '">' + W.icon(a.icon, 30) +
+      (a.status !== 'live' ? '<span class="badge">' + (a.status === 'beta' ? 'β 시범' : '준비 중') + '</span>' : '') + '</span>' +
+      '<span class="nm">' + W.esc(a.name) + '</span></button>';
+  }
+
+  function drawer() {
+    var list = W.filter(state.q, state.cat);
+    return list.length ? list.map(appIcon).join('') : '<div class="empty">찾는 앱이 없어요. 다른 단어로 검색해 보세요.</div>';
+  }
+
+  function renderHub() {
+    var t = W.totals();
+    var feat = W.APPS[0];
+    root.innerHTML =
+      '<div class="top"><div><div class="hello">우송대학교 AX 업무지원</div><h1>WOS 컬렉션</h1></div><button class="me" id="logout" type="button" title="로그아웃">나가기</button></div>' +
+      (state.view === 'home' ?
+        '<section class="bento">' +
+          '<div class="tile feature"><div><div class="tag">이번 주 추천 · ' + feat.id + '</div><h2>' + W.esc(feat.name) + '</h2><p>' + W.esc(feat.desc) + '</p></div>' +
+            '<a href="' + feat.url + '" target="_blank" rel="noopener">열어 보기</a></div>' +
+          '<div class="tile num"><b>' + t.apps + '</b><span>등록된 앱</span></div>' +
+          '<div class="tile num"><b>' + t.live + '</b><span>운영 중</span></div>' +
+          '<div class="tile num"><b>' + t.users.toLocaleString() + '</b><span>이번 학기 사용자</span></div>' +
+          '<div class="tile num"><b>' + Math.round(t.hours / 100) / 10 + '천</b><span>연간 절감 시간</span></div>' +
+        '</section>' : '') +
+      '<label class="search">' + W.icon('search', 20) + '<input id="q" type="search" placeholder="앱 검색" value="' + W.esc(state.q) + '" aria-label="앱 검색"></label>' +
+      '<div class="tabs">' + W.CATS.map(function (c) {
+        return '<button type="button" data-cat="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' + c.name + '</button>';
+      }).join('') + '</div>' +
+      '<section class="drawer" id="drawer">' + drawer() + '</section>' +
+      '<nav class="dock" aria-label="화면"><button type="button" data-view="home" class="' + (state.view === 'home' ? 'on' : '') + '">홈</button><button type="button" data-view="all" class="' + (state.view === 'all' ? 'on' : '') + '">모든 앱</button></nav>';
+
+    var q = document.getElementById('q');
+    q.addEventListener('input', function () { state.q = q.value; document.getElementById('drawer').innerHTML = drawer(); });
+    root.querySelectorAll('[data-cat]').forEach(function (b) { b.addEventListener('click', function () { state.cat = b.dataset.cat; renderHub(); }); });
+    root.querySelectorAll('[data-view]').forEach(function (b) { b.addEventListener('click', function () { state.view = b.dataset.view; renderHub(); }); });
+    document.getElementById('logout').addEventListener('click', function () { W.logout(); renderLogin(); });
+  }
+
+  function openSheet(a) {
+    var open = a.url && a.url !== '#' && a.status !== 'soon';
+    var bg = document.createElement('div');
+    bg.className = 'sheet-bg';
+    bg.innerHTML = '<div class="sheet" role="dialog" aria-label="' + W.esc(a.name) + '"><div class="grab"></div>' +
+      '<div class="sheet-head"><span class="squircle c-' + a.cat + '">' + W.icon(a.icon, 30) + '</span><div><h2>' + W.esc(a.name) + '</h2><div class="sub">' + a.id + ' · ' + W.esc(a.dept) + ' · ' + W.STATUS[a.status] + '</div></div></div>' +
+      '<p>' + W.esc(a.desc) + '</p>' +
+      '<div class="facts"><div><b>' + W.catName(a.cat) + '</b><span>분류</span></div><div><b>' + (a.users || '—') + '</b><span>사용자</span></div><div><b>' + (a.hours ? a.hours.toLocaleString() + 'h' : '—') + '</b><span>연간 절감</span></div></div>' +
+      (open ? '<a class="cta" href="' + a.url + '" target="_blank" rel="noopener">앱 열기</a>' : '<button class="cta off" type="button" disabled>' + (a.status === 'soon' ? '개발 중인 앱입니다' : '주소 연결 전입니다') + '</button>') +
+      '</div>';
+    bg.addEventListener('click', function (e) { if (e.target === bg) bg.remove(); });
+    document.body.appendChild(bg);
+  }
+
+  root.addEventListener('click', function (e) {
+    var k = e.target.closest('[data-k]'); if (k) return press(k.dataset.k);
+    var b = e.target.closest('.app'); if (!b) return;
+    openSheet(W.APPS.filter(function (x) { return x.id === b.dataset.id; })[0]);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { var s = document.querySelector('.sheet-bg'); if (s) s.remove(); }
+    if (W.isAuthed()) return;
+    if (/^[0-9]$/.test(e.key)) press(e.key);
+    else if (e.key === 'Backspace') press('del');
+  });
+
+  function render() { W.isAuthed() ? renderHub() : renderLogin(); }
+  render();
+})();
+</script>
+
+</html>
