@@ -1,8 +1,16 @@
-// WOS 컬렉션 공통 데이터 · 로그인 도우미 (세 가지 디자인 시안이 함께 씁니다)
-// 앱을 추가하려면 아래 APPS 배열에 한 줄을 더 넣으면 됩니다.
+// WOS 컬렉션 공통 모듈: 설정 · 앱 목록 불러오기/저장 · 로그인
+// 앱 목록은 apps.json 에 있고, 관리 화면에서 저장하면 GitHub 저장소의 apps.json 을 직접 고칩니다.
 window.WOS = (function () {
-  var ADMIN_PIN = '9660';
-  var KEY = 'wos-collection-auth';
+  var CONFIG = {
+    adminPin: '9660',
+    // 관리 화면에서 저장할 GitHub 저장소 (GitHub Pages가 배포하는 브랜치)
+    repo: { owner: 'gt4065c-cell', name: 'wos-collection', branch: 'main', path: 'apps.json' }
+  };
+  var AUTH_KEY = 'wos-collection-auth';
+  var TOKEN_KEY = 'wos-collection-gh-token';
+  var RECENT_KEY = 'wos-collection-recent';   // 방금 저장한 목록(사이트 반영 전까지 이 브라우저에서 먼저 보여 줌)
+  var LOCAL_KEY = 'wos-collection-local';     // GitHub 연결 없이 이 브라우저에만 저장한 목록
+  var RECENT_MS = 10 * 60 * 1000;
 
   var CATS = [
     { id: 'all', name: '전체' },
@@ -12,24 +20,6 @@ window.WOS = (function () {
     { id: 'research', name: '연구지원' },
     { id: 'idea', name: '혁신·소통' }
   ];
-
-  // status: live(운영 중) · beta(시범 운영) · soon(개발 중)
-  // hours: 연간 절감 예상 시간(교직원 전체 기준)
-  var APPS = [
-    { id: 'WOS-001', name: 'WOS 아이디어 뱅크', cat: 'idea', status: 'live', icon: 'bulb', dept: 'AI혁신추진위원회', hours: 0, users: 412, url: 'https://gt4065b.github.io/wos-idea-bank/', desc: '업무 개선 아이디어를 등록하고 격주 심의로 정규 WOS 리스트에 올립니다.' },
-    { id: 'WOS-002', name: '회의록 자동 요약', cat: 'admin', status: 'live', icon: 'doc', dept: '기획처', hours: 1840, users: 236, url: '#', desc: '녹음 파일을 올리면 안건·결정사항·담당자별 할 일로 정리합니다.' },
-    { id: 'WOS-003', name: '강의계획서 도우미', cat: 'teach', status: 'live', icon: 'book', dept: '교수학습혁신센터', hours: 2600, users: 318, url: '#', desc: '교과목 개요와 학습성과를 넣으면 15주 강의계획서 초안을 만듭니다.' },
-    { id: 'WOS-004', name: '공문 작성 도우미', cat: 'admin', status: 'live', icon: 'pen', dept: '총무팀', hours: 1320, users: 190, url: '#', desc: '대학 공문 서식과 문체에 맞춰 시행문·내부결재 초안을 씁니다.' },
-    { id: 'WOS-005', name: '외국인 유학생 다국어 안내', cat: 'student', status: 'beta', icon: 'globe', dept: '국제교류처', hours: 960, users: 84, url: '#', desc: '학사 공지를 영어·중국어·베트남어·우즈베크어로 바로 번역해 보냅니다.' },
-    { id: 'WOS-006', name: '학생 상담 기록 정리', cat: 'student', status: 'beta', icon: 'chat', dept: '학생상담센터', hours: 1100, users: 57, url: '#', desc: '상담 메모를 표준 상담일지 양식으로 바꾸고 후속 조치를 알려 줍니다.' },
-    { id: 'WOS-007', name: '연구비 집행 점검', cat: 'research', status: 'beta', icon: 'coin', dept: '산학협력단', hours: 740, users: 41, url: '#', desc: '영수증을 올리면 과제별 집행 기준 위반 여부를 먼저 확인합니다.' },
-    { id: 'WOS-008', name: '수업 퀴즈 생성기', cat: 'teach', status: 'live', icon: 'spark', dept: '교수학습혁신센터', hours: 1580, users: 274, url: '#', desc: '강의자료 PDF에서 난이도별 퀴즈와 해설을 자동으로 뽑습니다.' },
-    { id: 'WOS-009', name: '설문 결과 분석', cat: 'research', status: 'live', icon: 'chart', dept: 'IR센터', hours: 680, users: 96, url: '#', desc: '만족도 조사 응답을 받아 문항별 그래프와 서술형 응답 요약을 만듭니다.' },
-    { id: 'WOS-010', name: '학사일정 챗봇', cat: 'student', status: 'soon', icon: 'calendar', dept: '학사지원팀', hours: 0, users: 0, url: '#', desc: '수강신청·휴복학·성적 정정 기간을 학생 질문에 맞춰 안내합니다.' },
-    { id: 'WOS-011', name: '출결 이의신청 처리', cat: 'teach', status: 'soon', icon: 'check', dept: '학사지원팀', hours: 0, users: 0, url: '#', desc: '공결 서류를 확인하고 담당 교수에게 승인 요청을 자동으로 보냅니다.' },
-    { id: 'WOS-012', name: '학생 성향 진단(MBTI)', cat: 'student', status: 'beta', icon: 'users', dept: '학생성공센터', hours: 300, users: 128, url: '#', desc: '신입생 성향 진단 결과로 팀 프로젝트 조 편성을 돕습니다.' }
-  ];
-
   var STATUS = { live: '운영 중', beta: '시범 운영', soon: '개발 중' };
 
   // 24×24 선 아이콘
@@ -45,58 +35,187 @@ window.WOS = (function () {
     chart: '<path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/>',
     calendar: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
     check: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8M21 20c0-2.7-1.6-5-4-5.7"/>',
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
-    users: '<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8M21 20c0-2.7-1.6-5-4-5.7"/>'
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>'
+  };
+  // 관리 화면의 아이콘 선택지 (plus·gear·search 는 화면용이라 제외)
+  var APP_ICONS = ['bulb', 'doc', 'book', 'pen', 'globe', 'chat', 'coin', 'spark', 'chart', 'calendar', 'check', 'users'];
+
+  var api = {
+    CONFIG: CONFIG, CATS: CATS, STATUS: STATUS, APP_ICONS: APP_ICONS,
+    APPS: [],
+    source: 'site'   // site · recent · local
   };
 
-  function icon(name, size) {
+  function store(kind, key, val) {
+    try {
+      var s = kind === 'session' ? sessionStorage : localStorage;
+      if (val === undefined) return s.getItem(key);
+      if (val === null) s.removeItem(key); else s.setItem(key, val);
+    } catch (e) { return null; }
+  }
+
+  api.icon = function (name, size) {
     return '<svg viewBox="0 0 24 24" width="' + (size || 24) + '" height="' + (size || 24) +
       '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       (ICONS[name] || ICONS.spark) + '</svg>';
-  }
+  };
 
-  function isAuthed() {
-    try { return sessionStorage.getItem(KEY) === 'ok'; } catch (e) { return !!window.__wosAuthed; }
-  }
-  function login(pin) {
-    if (String(pin).trim() !== ADMIN_PIN) return false;
+  api.isAuthed = function () { return store('session', AUTH_KEY) === 'ok' || !!window.__wosAuthed; };
+  api.login = function (pin) {
+    if (String(pin).trim() !== CONFIG.adminPin) return false;
     window.__wosAuthed = true;
-    try { sessionStorage.setItem(KEY, 'ok'); } catch (e) {}
+    store('session', AUTH_KEY, 'ok');
     return true;
-  }
-  function logout() {
-    window.__wosAuthed = false;
-    try { sessionStorage.removeItem(KEY); } catch (e) {}
-  }
+  };
+  api.logout = function () { window.__wosAuthed = false; store('session', AUTH_KEY, null); };
 
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
+  api.esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
-  }
+  };
 
-  function filter(q, cat) {
+  api.filter = function (q, cat) {
     q = (q || '').trim().toLowerCase();
-    return APPS.filter(function (a) {
+    return api.APPS.filter(function (a) {
       if (cat && cat !== 'all' && a.cat !== cat) return false;
       if (!q) return true;
       return (a.name + a.desc + a.dept + a.id).toLowerCase().indexOf(q) > -1;
     });
-  }
+  };
 
-  function catName(id) {
+  api.catName = function (id) {
     for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i].name;
     return id;
-  }
+  };
 
-  function totals() {
-    var t = { apps: APPS.length, live: 0, hours: 0, users: 0 };
-    APPS.forEach(function (a) {
+  api.totals = function () {
+    var t = { apps: api.APPS.length, live: 0, hours: 0, users: 0 };
+    api.APPS.forEach(function (a) {
       if (a.status === 'live') t.live++;
-      t.hours += a.hours; t.users += a.users;
+      t.hours += +a.hours || 0; t.users += +a.users || 0;
     });
     return t;
+  };
+
+  api.featured = function () {
+    return api.APPS.filter(function (a) { return a.featured; })[0] || api.APPS[0];
+  };
+
+  api.hasUrl = function (a) { return !!a.url && a.url !== '#'; };
+
+  api.nextId = function () {
+    var max = 0;
+    api.APPS.forEach(function (a) { var m = /(\d+)$/.exec(a.id || ''); if (m) max = Math.max(max, +m[1]); });
+    return 'WOS-' + String(max + 1).padStart(3, '0');
+  };
+
+  // 사이트의 apps.json 을 읽되, 이 브라우저에서 방금 저장한 목록이 있으면 그것을 먼저 보여 줌
+  api.load = function () {
+    function parse(raw) { try { return JSON.parse(raw); } catch (e) { return null; } }
+    var local = parse(store('local', LOCAL_KEY));
+    var recent = parse(store('local', RECENT_KEY));
+    return fetch(CONFIG.repo.path + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (site) {
+        if (local && local.apps) { api.source = 'local'; return local.apps; }
+        if (recent && Date.now() - recent.at < RECENT_MS && JSON.stringify(site) !== JSON.stringify(recent.apps)) {
+          api.source = 'recent'; return recent.apps;
+        }
+        store('local', RECENT_KEY, null);
+        api.source = 'site'; return site;
+      })
+      .catch(function () {
+        if (local && local.apps) { api.source = 'local'; return local.apps; }
+        if (recent && recent.apps) { api.source = 'recent'; return recent.apps; }
+        throw new Error('앱 목록(apps.json)을 불러오지 못했습니다.');
+      })
+      .then(function (list) { api.APPS = Array.isArray(list) ? list : []; return api.APPS; });
+  };
+
+  // GitHub 연결(토큰)
+  api.token = function (v) {
+    if (v === undefined) return store('local', TOKEN_KEY) || '';
+    store('local', TOKEN_KEY, v ? String(v).trim() : null);
+  };
+
+  function gh(method, body) {
+    var r = CONFIG.repo;
+    var url = 'https://api.github.com/repos/' + r.owner + '/' + r.name + '/contents/' + r.path +
+      (method === 'GET' ? '?ref=' + encodeURIComponent(r.branch) + '&t=' + Date.now() : '');
+    return fetch(url, {
+      method: method,
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + api.token(),
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      body: body ? JSON.stringify(body) : undefined
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (res.ok || (method === 'GET' && res.status === 404)) return { status: res.status, data: data };
+        var msg = {
+          401: 'GitHub 토큰이 맞지 않거나 기한이 지났습니다. 관리 화면에서 토큰을 다시 넣어 주세요.',
+          403: '이 토큰에는 저장소에 쓸 권한이 없습니다. 토큰의 Contents 권한을 Read and write 로 바꿔 주세요.',
+          404: '저장소를 찾지 못했습니다. 토큰이 ' + r.owner + '/' + r.name + ' 저장소에 접근할 수 있는지 확인해 주세요.',
+          409: '다른 관리자가 먼저 저장했습니다. 새로고침한 뒤 다시 저장해 주세요.',
+          422: '다른 관리자가 먼저 저장했습니다. 새로고침한 뒤 다시 저장해 주세요.'
+        }[res.status] || ('GitHub 저장에 실패했습니다 (' + res.status + '): ' + (data.message || ''));
+        throw new Error(msg);
+      });
+    });
   }
 
-  return { CATS: CATS, APPS: APPS, STATUS: STATUS, icon: icon, isAuthed: isAuthed, login: login, logout: logout, esc: esc, filter: filter, catName: catName, totals: totals };
+  function toBase64(text) {
+    var bytes = new TextEncoder().encode(text), bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+
+  // 목록 저장: 토큰이 있으면 GitHub apps.json 에 커밋, 없으면 이 브라우저에만 저장
+  api.save = function (list, message) {
+    var text = JSON.stringify(list, null, 2) + '\n';
+    if (!api.token()) {
+      store('local', LOCAL_KEY, JSON.stringify({ at: Date.now(), apps: list }));
+      api.APPS = list; api.source = 'local';
+      return Promise.resolve({ where: 'local' });
+    }
+    return gh('GET').then(function (cur) {
+      return gh('PUT', {
+        message: message || 'Update apps.json',
+        content: toBase64(text),
+        branch: CONFIG.repo.branch,
+        sha: cur.status === 200 ? cur.data.sha : undefined
+      });
+    }).then(function () {
+      store('local', RECENT_KEY, JSON.stringify({ at: Date.now(), apps: list }));
+      store('local', LOCAL_KEY, null);
+      api.APPS = list; api.source = 'recent';
+      return { where: 'github' };
+    });
+  };
+
+  // 이 브라우저에만 있던 목록을 버리고 사이트 목록으로 되돌림
+  api.discardLocal = function () { store('local', LOCAL_KEY, null); store('local', RECENT_KEY, null); };
+
+  // 토큰 확인: 저장소 쓰기 권한이 있는지
+  api.checkToken = function () {
+    var r = CONFIG.repo;
+    return fetch('https://api.github.com/repos/' + r.owner + '/' + r.name, {
+      headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + api.token() }
+    }).then(function (res) {
+      if (res.status === 401) throw new Error('토큰이 맞지 않습니다.');
+      if (!res.ok) throw new Error('저장소에 접근할 수 없습니다 (' + res.status + ').');
+      return res.json();
+    }).then(function (repo) {
+      if (repo.permissions && !repo.permissions.push) throw new Error('이 토큰은 읽기만 가능합니다. 쓰기 권한이 필요합니다.');
+      return true;
+    });
+  };
+
+  return api;
 })();
