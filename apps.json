@@ -153,7 +153,19 @@
     "hours": 0,
     "users": 0,
     "url": "https://test-b0582.web.app/",
-    "desc": "AI도우미가 탑재된 수업 운영 홈페이지를 만들 수 있습니다.",
+    "desc": "AI도우미가 탑재된 수업 운영 홈페이지를 만들 수 있습니다."
+  },
+  {
+    "id": "WOS-014",
+    "name": "기초 일본어 75문장",
+    "cat": "student",
+    "status": "beta",
+    "icon": "pen",
+    "dept": "AI경영",
+    "hours": 0,
+    "users": 0,
+    "url": "https://gt4065c-cell.github.io/nihongo/?lang=ko?v=3",
+    "desc": "한국어와 영어로 일본어를 가장 빨리 배울 수 있습니다.",
     "featured": true
   }
 ]
