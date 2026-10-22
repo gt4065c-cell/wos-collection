@@ -179,5 +179,17 @@
     "users": 0,
     "url": "https://srt-gt4065b.github.io/student-qna/",
     "desc": "과사무실 학생문의 도우미 챗봇"
+  },
+  {
+    "id": "WOS-016",
+    "name": "24시간 원어민 친구 (한국/중국/일본/영어)",
+    "cat": "student",
+    "status": "beta",
+    "icon": "globe",
+    "dept": "AI경영",
+    "hours": 0,
+    "users": 0,
+    "url": "https://bestfriend.zeabur.app/",
+    "desc": "24시간 원어민 친구 (한국/중국/일본/영어)"
   }
 ]
