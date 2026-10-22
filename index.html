@@ -164,6 +164,9 @@ textarea.in { resize: vertical; min-height: 64px; }
 .dock { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 4px; background: var(--card); border-radius: 999px; padding: 6px; box-shadow: 0 12px 30px -10px rgba(0,0,0,.3); z-index: 10; }
 .dock button { border: 0; background: none; border-radius: 999px; padding: 9px 16px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .dock button.on { background: var(--hero); color: var(--hero-ink); }
+/* 관리자 진입: 우측 하단의 희미한 톱니 */
+.gear { position: fixed; right: calc(10px + env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: 30px; height: 30px; display: grid; place-items: center; border: 0; background: none; color: var(--muted); opacity: .22; cursor: pointer; z-index: 11; border-radius: 50%; transition: opacity .2s; }
+.gear:hover, .gear:focus-visible { opacity: .8; }
 
 @media (max-width: 720px) {
   .bento { grid-template-columns: 1fr 1fr; }

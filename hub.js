@@ -1,4 +1,4 @@
-// WOS 컬렉션 화면: PIN 로그인 · 홈 · 모든 앱 · 앱 관리
+// WOS 컬렉션 화면: 홈 · 모든 앱(누구나) · 앱 관리(우측 하단 톱니 → 관리자 PIN)
 (function () {
   var W = window.WOS, root = document.getElementById('app');
   var state = { q: '', cat: 'all', view: 'home', loaded: false, loadError: '' };
@@ -22,14 +22,16 @@
     root.innerHTML =
       '<div class="lock">' +
         '<div class="lock-logo">WOS</div>' +
-        '<div><h1>WOS 컬렉션</h1><p>관리자 PIN 4자리를 눌러 주세요</p></div>' +
+        '<div><h1>관리자 확인</h1><p>관리자 PIN 4자리를 눌러 주세요</p></div>' +
         '<div class="dots' + (msg ? ' shake' : '') + '" aria-label="입력한 자리수 ' + pin.length + '">' +
           [0, 1, 2, 3].map(function (i) { return '<i class="' + (i < pin.length ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
         '<div class="msg" role="alert">' + (msg || '') + '</div>' +
         '<div class="pad">' + ['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(function (n) { return '<button type="button" data-k="' + n + '">' + n + '</button>'; }).join('') +
           '<button type="button" class="fn" data-k="clr">지우기</button><button type="button" data-k="0">0</button><button type="button" class="fn" data-k="del">←</button></div>' +
         '<p class="hint">키보드 숫자로도 입력할 수 있습니다</p>' +
+        '<button type="button" class="me" id="back">← 돌아가기</button>' +
       '</div>';
+    document.getElementById('back').addEventListener('click', function () { pin = ''; go('home'); });
   }
 
   function press(k) {
@@ -38,7 +40,7 @@
     else if (pin.length < 4) pin += k;
     if (pin.length === 4) {
       var ok = W.login(pin); pin = '';
-      if (ok) return render();
+      if (ok) return go('manage');
       return renderLogin('PIN이 맞지 않습니다');
     }
     renderLogin();
@@ -54,7 +56,7 @@
 
   function drawer() {
     var list = W.filter(state.q, state.cat);
-    if (!W.APPS.length) return '<div class="empty">아직 등록된 앱이 없습니다. 아래 \'관리\'에서 첫 앱을 추가해 주세요.</div>';
+    if (!W.APPS.length) return '<div class="empty">아직 등록된 앱이 없습니다.</div>';
     return list.length ? list.map(appIcon).join('') : '<div class="empty">찾는 앱이 없어요. 다른 단어로 검색해 보세요.</div>';
   }
 
@@ -65,7 +67,7 @@
     var feat = f
       ? '<div class="tile feature"><div><div class="tag">이번 주 추천 · ' + W.esc(f.id) + '</div><h2>' + W.esc(f.name) + '</h2><p>' + W.esc(f.desc) + '</p></div>' +
           (canOpen(f) ? '<a href="' + W.esc(f.url) + '" target="_blank" rel="noopener">열어 보기</a>' : '<button type="button" data-id="' + W.esc(f.id) + '" class="app-open">자세히 보기</button>') + '</div>'
-      : '<div class="tile feature"><div><div class="tag">추천 앱</div><h2>첫 앱을 등록해 주세요</h2><p>관리 화면에서 앱 주소를 추가하면 여기에 보입니다.</p></div><button type="button" data-view="manage">앱 추가하기</button></div>';
+      : '<div class="tile feature"><div><div class="tag">추천 앱</div><h2>첫 앱을 등록해 주세요</h2><p>곧 업무지원 앱이 이곳에 모입니다.</p></div></div>';
     return '<section class="bento">' + feat +
       '<div class="tile num"><b>' + t.apps + '</b><span>등록된 앱</span></div>' +
       '<div class="tile num"><b>' + t.live + '</b><span>운영 중</span></div>' +
@@ -75,9 +77,10 @@
   }
 
   function dock() {
-    return '<nav class="dock" aria-label="화면">' + [['home', '홈'], ['all', '모든 앱'], ['manage', '관리']].map(function (v) {
+    return '<nav class="dock" aria-label="화면">' + [['home', '홈'], ['all', '모든 앱']].map(function (v) {
       return '<button type="button" data-view="' + v[0] + '" class="' + (state.view === v[0] ? 'on' : '') + '">' + v[1] + '</button>';
-    }).join('') + '</nav>';
+    }).join('') + '</nav>' +
+    (state.view === 'manage' ? '' : '<button type="button" class="gear" data-view="manage" aria-label="관리자">' + W.icon('gear', 16) + '</button>');
   }
 
   function renderHub() {
@@ -85,7 +88,8 @@
       root.innerHTML = '<div class="empty">' + (state.loadError ? W.esc(state.loadError) + ' 잠시 뒤 새로고침해 주세요.' : '앱 목록을 불러오는 중…') + '</div>';
       return;
     }
-    var top = '<div class="top"><div><div class="hello">우송대학교 AX 업무지원</div><h1>WOS 컬렉션</h1></div><button class="me" id="logout" type="button" title="로그아웃">나가기</button></div>';
+    var top = '<div class="top"><div><div class="hello">우송대학교 AX 업무지원</div><h1>WOS 컬렉션</h1></div>' +
+      (state.view === 'manage' ? '<button class="me" id="logout" type="button">관리 끝내기</button>' : '') + '</div>';
     if (state.view === 'manage') { root.innerHTML = top + manageView() + dock(); bindCommon(); bindManage(); return; }
 
     root.innerHTML = top + (state.view === 'home' ? bento() : '') +
@@ -103,9 +107,10 @@
 
   function bindCommon() {
     root.querySelectorAll('[data-view]').forEach(function (b) {
-      b.addEventListener('click', function () { state.view = b.dataset.view; renderHub(); window.scrollTo(0, 0); });
+      b.addEventListener('click', function () { go(b.dataset.view); });
     });
-    document.getElementById('logout').addEventListener('click', function () { W.logout(); renderLogin(); });
+    var out = document.getElementById('logout');
+    if (out) out.addEventListener('click', function () { W.logout(); toast('관리를 끝냈습니다.'); go('home'); });
   }
 
   function openSheet(a) {
@@ -294,14 +299,21 @@
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { var s = document.querySelectorAll('.sheet-bg'); if (s.length) s[s.length - 1].remove(); }
-    if (W.isAuthed()) return;
+    if (state.view !== 'login') return;
+    if (e.key === 'Escape') { pin = ''; return go('home'); }
     if (/^[0-9]$/.test(e.key)) press(e.key);
     else if (e.key === 'Backspace') press('del');
   });
 
-  function render() { W.isAuthed() ? renderHub() : renderLogin(); }
+  // 화면 이동: 관리 화면은 관리자 PIN 확인 뒤에만 열림
+  function go(view) {
+    if (view === 'manage' && !W.isAuthed()) view = 'login';
+    state.view = view;
+    if (view === 'login') renderLogin(); else renderHub();
+    window.scrollTo(0, 0);
+  }
 
   W.load().then(function () { state.loaded = true; }).catch(function (e) { state.loadError = e.message; })
-    .then(function () { if (W.isAuthed()) renderHub(); });
-  render();
+    .then(function () { if (state.view !== 'login') renderHub(); });
+  renderHub();
 })();
