@@ -191,5 +191,17 @@
     "users": 0,
     "url": "https://bestfriend.zeabur.app/",
     "desc": "24시간 원어민 친구 (한국/중국/일본/영어)"
+  },
+  {
+    "id": "WOS-017",
+    "name": "서양 인문고전 100선 오디오 북",
+    "cat": "student",
+    "status": "live",
+    "icon": "bulb",
+    "dept": "AI경영",
+    "hours": 0,
+    "users": 0,
+    "url": "https://gt4065x.github.io/audiobook/",
+    "desc": "고대 그리스 소크라테스부터 아인쉬타인의 상대성원리까지 2400여년간의 인류의역사상 가장 위대한 철학가 사상가들의 최대 걸작들만을 모았습니다."
   }
 ]
