@@ -57,8 +57,7 @@
     "hours": 960,
     "users": 84,
     "url": "https://translation-delta-azure.vercel.app",
-    "desc": "강의실에서 교수님의 강의 내용을 실시간으로 영어·중국어·베트남어·우즈베크어로 바로 번역해 보여줍니다.",
-    "featured": true
+    "desc": "강의실에서 교수님의 강의 내용을 실시간으로 영어·중국어·베트남어·우즈베크어로 바로 번역해 보여줍니다."
   },
   {
     "id": "WOS-006",
@@ -143,5 +142,18 @@
     "users": 128,
     "url": "#",
     "desc": "신입생 성향 진단 결과로 팀 프로젝트 조 편성을 돕습니다."
+  },
+  {
+    "id": "WOS-013",
+    "name": "WOS 강의플랫폼 (New AI LMS)",
+    "cat": "admin",
+    "status": "live",
+    "icon": "book",
+    "dept": "",
+    "hours": 0,
+    "users": 0,
+    "url": "https://test-b0582.web.app/",
+    "desc": "AI도우미가 탑재된 수업 운영 홈페이지를 만들 수 있습니다.",
+    "featured": true
   }
 ]
